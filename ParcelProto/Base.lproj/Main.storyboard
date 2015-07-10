@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8121.17" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8101.14"/>
+    </dependencies>
+    <scenes>
+        <!--Scene View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="SceneViewController" customModule="ParcelProto" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="r15-z3-tBA">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                            </mapView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="U3f-yw-t5S">
+                                <rect key="frame" x="534" y="0.0" width="66" height="600"/>
+                                <subviews>
+                                    <button contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="n39-NK-8YO">
+                                        <rect key="frame" x="8" y="521" width="51" height="54"/>
+                                        <state key="normal" image="FireOFF"/>
+                                        <state key="selected" image="FireON"/>
+                                        <state key="highlighted" image="FireON"/>
+                                        <connections>
+                                            <action selector="fire:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ql9-hn-dL2"/>
+                                        </connections>
+                                    </button>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="JaugeBG" translatesAutoresizingMaskIntoConstraints="NO" id="rK0-SS-73M">
+                                        <rect key="frame" x="15" y="249" width="37" height="252"/>
+                                    </imageView>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="JaugeCarret" translatesAutoresizingMaskIntoConstraints="NO" id="Yn5-XS-PUK">
+                                        <rect key="frame" x="15" y="474" width="37" height="10"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.33333333333333331" alpha="0.80000000000000004" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="rK0-SS-73M" secondAttribute="trailing" constant="14" id="5p0-9m-xZ5"/>
+                                    <constraint firstAttribute="width" constant="66" id="98d-cf-2aa"/>
+                                    <constraint firstItem="n39-NK-8YO" firstAttribute="leading" secondItem="U3f-yw-t5S" secondAttribute="leading" constant="8" id="MDm-Ac-nhw"/>
+                                    <constraint firstItem="rK0-SS-73M" firstAttribute="top" secondItem="Yn5-XS-PUK" secondAttribute="bottom" constant="-40" id="TsK-aU-KcJ"/>
+                                    <constraint firstItem="Yn5-XS-PUK" firstAttribute="centerX" secondItem="rK0-SS-73M" secondAttribute="centerX" id="Yob-BD-cY1"/>
+                                    <constraint firstItem="n39-NK-8YO" firstAttribute="top" secondItem="rK0-SS-73M" secondAttribute="bottom" constant="20" id="eDe-Pw-wNv"/>
+                                    <constraint firstItem="rK0-SS-73M" firstAttribute="top" secondItem="Yn5-XS-PUK" secondAttribute="bottom" constant="-235" id="fQl-ki-s4c"/>
+                                    <constraint firstAttribute="bottom" secondItem="n39-NK-8YO" secondAttribute="bottom" constant="25" id="lkE-IP-sxR"/>
+                                    <constraint firstAttribute="trailing" secondItem="n39-NK-8YO" secondAttribute="trailing" constant="7" id="uXh-o8-Dut"/>
+                                </constraints>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="TsK-aU-KcJ"/>
+                                    </mask>
+                                </variation>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="U3f-yw-t5S" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="Bha-cb-mvx"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="r15-z3-tBA" secondAttribute="bottom" id="D7W-tF-pc2"/>
+                            <constraint firstItem="r15-z3-tBA" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="H8h-cd-PnT"/>
+                            <constraint firstAttribute="trailing" secondItem="U3f-yw-t5S" secondAttribute="trailing" id="XZw-vL-atL"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="U3f-yw-t5S" secondAttribute="bottom" id="toe-yw-RTF"/>
+                            <constraint firstAttribute="trailing" secondItem="r15-z3-tBA" secondAttribute="trailing" id="ujP-wW-irP"/>
+                            <constraint firstItem="r15-z3-tBA" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="ys7-nv-fRg"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="carret" destination="Yn5-XS-PUK" id="pYH-AZ-ziQ"/>
+                        <outlet property="carretTopConstraint" destination="fQl-ki-s4c" id="30u-AZ-Xqb"/>
+                        <outlet property="controlView" destination="U3f-yw-t5S" id="XIV-Y9-aVB"/>
+                        <outlet property="fireButton" destination="n39-NK-8YO" id="2Up-LG-kh3"/>
+                        <outlet property="mapView" destination="r15-z3-tBA" id="SA5-0h-xSu"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="332" y="387"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="FireOFF" width="51" height="54"/>
+        <image name="FireON" width="51" height="55"/>
+        <image name="JaugeBG" width="37" height="252"/>
+        <image name="JaugeCarret" width="37" height="10"/>
+    </resources>
+</document>
