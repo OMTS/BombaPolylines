@@ -95,6 +95,7 @@ class SceneViewController: UIViewController {
         super.viewDidLoad()
         initUpdateLoop()
         initGame()
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
 
     @IBAction func fire(sender: UIButton) {
@@ -252,8 +253,13 @@ extension SceneViewController {
         imageview.animationDuration = 0.8
         return imageview
     }
-}
+    
+    func getTargetAnimatedImage() -> UIImageView {
+        let imageview = UIImageView(image: UIImage(assetIdentifier: .TargetAnimated))
 
+        return imageview
+    }
+}
 
 
 
@@ -282,14 +288,22 @@ extension SceneViewController: MKMapViewDelegate {
             if annotationView == nil {
                 annotationView = MKAnnotationView(annotation: targetAnnotation, reuseIdentifier: targetIdentifier)
             }
-            annotationView!.image = UIImage(assetIdentifier: .TargetImage)
+            let animatedImageView = getTargetAnimatedImage()
+            //animatedImageView.layer.borderWidth = 2.0
+            annotationView?.centerOffset = CGPointMake(-animatedImageView.frame.size.width/2, -animatedImageView.frame.size.height);
+            annotationView!.addSubview(animatedImageView)
+            animatedImageView.startAnimating()
+
+            //annotationView!.image = UIImage(assetIdentifier: .TargetImage)
         }
         else {
             annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier(pinIdentifier)
             if annotationView == nil {
                 annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: pinIdentifier)
             }
-            annotationView!.image = UIImage(assetIdentifier: .ParcelImage)
+            annotationView!.image = UIImage(assetIdentifier: .Bomb)
+            annotationView?.centerOffset = CGPointMake(0, -80);
+
             parcelAnnotationView = annotationView
         }
         return annotationView!

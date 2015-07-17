@@ -13,12 +13,14 @@ extension UIImage {
         case AppIcon = "AppIcon"
         case LaunchImage = "LaunchImage"
         case ParcelImage = "ParcelImage"
-        case TargetImage = "TargetImage"
+        case TargetImage = "you0"
+        case TargetAnimated = "target"
         case YouImage = "YouImage"
         case FireON = "FireON"
         case FireOFF = "FireOFF"
         case JaugeBG = "JaugeBG"
         case JaugeCarret = "JaugeCarret"
+        case Bomb = "bomb"
     }
     
     convenience init!(assetIdentifier: AssetIdentifier) {
