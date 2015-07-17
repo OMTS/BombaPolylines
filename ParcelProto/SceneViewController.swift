@@ -58,6 +58,11 @@ class SceneViewController: UIViewController {
     var distance: CLLocationDistance = 0
     weak var parcelAnnotationView: MKAnnotationView!
     
+    var targetPosition: CLLocation?
+    var userLocation: CLLocation?
+    
+    let locationManager = CLLocationManager()
+    
     var fired = false {
         willSet {
             self.fireButton.enabled = fired
@@ -86,6 +91,9 @@ class SceneViewController: UIViewController {
         percentOfFirePower = 1.0
     }
     
+    @IBAction func goBack(sender: UIButton) {
+        self.navigationController?.popViewControllerAnimated(true)
+    }
     func initUpdateLoop() {
         let displayLink = CADisplayLink(target: self, selector: "update")
         displayLink.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
@@ -93,9 +101,16 @@ class SceneViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initUpdateLoop()
-        initGame()
+        
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+        
+        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        if #available(iOS 9.0, *) {
+            locationManager.requestLocation()
+        } else {
+            // Fallback on earlier versions
+            handleLocationPermissions()
+        }
     }
 
     @IBAction func fire(sender: UIButton) {
@@ -103,36 +118,75 @@ class SceneViewController: UIViewController {
     }
 }
 
+extension SceneViewController: CLLocationManagerDelegate {
+   
+    func handleLocationPermissions() {
+        locationManager.delegate = self
+        switch CLLocationManager.authorizationStatus() {
+        case .Denied:
+            //show error view
+            break
+        case .NotDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        case .AuthorizedWhenInUse:
+            //All good
+            locationManager.startUpdatingLocation()
+            break
+        case .Restricted:
+            //Npt user's fault -> Display error anyway but without the tap gesture
+            break
+        default:
+            break
+        }
+    }
+    
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [AnyObject]) {
+        if let location = locations.first as? CLLocation {
+            print("Current location: \(location)")
+            if userLocation == nil {
+                userLocation = location
+                initUpdateLoop()
+                initGame()
+            }
+        }
+    }
+    
+    func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
+        print("Error finding location: \(error.localizedDescription)")
+    }
+    
+    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        handleLocationPermissions()
+    }
+    
+}
+
 extension SceneViewController {
     func initGame(withRegionFit: Bool = true) {
         
-        if withRegionFit {
-            let startCoord = CLLocationCoordinate2DMake(39.013762, -94.400840)
-            let adjustedRegion = mapView.regionThatFits(MKCoordinateRegionMakeWithDistance(startCoord, 4800000, 4800000))
-            mapView.setRegion(adjustedRegion, animated: true)
-        }
-
         mapView.delegate = self
-        
-        let LAX = CLLocation(latitude: 33.9424955, longitude: -118.4080684)
-        let JFK = CLLocation(latitude: 40.6397511, longitude: -73.7789256)
-        
-        distance = CLLocation.distance(from: LAX.coordinate, to: JFK.coordinate)
-        
+        distance = CLLocation.distance(from: userLocation!.coordinate, to: targetPosition!.coordinate)
         
         youAnnotation = MKPointAnnotation()
-        youAnnotation.coordinate = LAX.coordinate
+        youAnnotation.coordinate = userLocation!.coordinate
         mapView.addAnnotation(youAnnotation)
         
         targetAnnotation = MKPointAnnotation()
-        targetAnnotation.coordinate = JFK.coordinate
+        targetAnnotation.coordinate = targetPosition!.coordinate
         mapView.addAnnotation(targetAnnotation)
         
         parcelAnnotation = MKPointAnnotation()
         parcelAnnotation!.title = "Parcel"
-        parcelAnnotation!.coordinate = LAX.coordinate
+        parcelAnnotation!.coordinate = userLocation!.coordinate
         mapView.addAnnotation(parcelAnnotation!)
 
+        
+        if withRegionFit {
+           // let startCoord = CLLocationCoordinate2DMake(39.013762, -94.400840)
+           // let adjustedRegion = mapView.regionThatFits(MKCoordinateRegionMakeWithDistance(startCoord, 4800000, 4800000))
+           // mapView.setRegion(adjustedRegion, animated: true)
+            mapView.showAnnotations([youAnnotation, targetAnnotation], animated: true)
+        }
         
         self.fireButton.enabled = false
         let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(3.0 * Double(NSEC_PER_SEC)))
@@ -207,8 +261,8 @@ extension SceneViewController {
         fired = true
         carretHasToMove = false
         parcelAnnotationPosition = 0
-        let LAX = CLLocation(latitude: 33.9424955, longitude: -118.4080684)
-        parcelAnnotation!.coordinate = LAX.coordinate
+        //let LAX = CLLocation(latitude: 33.9424955, longitude: -118.4080684)
+        parcelAnnotation!.coordinate = userLocation!.coordinate
     }
 
     func update() {
@@ -216,7 +270,16 @@ extension SceneViewController {
             return
         }
         
-        let parcelStep = 10
+        var parcelStep: Int
+        if distance < 600_000 {
+            parcelStep = 1
+        }
+        else if distance >= 600_000 && distance < 900_000 {
+            parcelStep = 3
+        }
+        else {
+            parcelStep = 10
+        }
         
         if carretHasToMove {
             let nextPosition = actualCarret.nextPosition()
@@ -277,9 +340,11 @@ extension SceneViewController: MKMapViewDelegate {
                 annotationView = MKAnnotationView(annotation: youAnnotation, reuseIdentifier: youIdentitifer)
             }
             let animatedImageView = getYouAnimatedImage()
+            animatedImageView.tag = 999
             view.backgroundColor = UIColor.redColor()
 
             annotationView?.centerOffset = CGPointMake(-animatedImageView.frame.size.width/2, -animatedImageView.frame.size.height);
+            annotationView!.viewWithTag(999)?.removeFromSuperview()
             annotationView!.addSubview(animatedImageView)
             animatedImageView.startAnimating()
         }
@@ -291,6 +356,8 @@ extension SceneViewController: MKMapViewDelegate {
             let animatedImageView = getTargetAnimatedImage()
             //animatedImageView.layer.borderWidth = 2.0
             annotationView?.centerOffset = CGPointMake(-animatedImageView.frame.size.width/2, -animatedImageView.frame.size.height);
+            animatedImageView.tag = 999
+            annotationView!.viewWithTag(999)?.removeFromSuperview()
             annotationView!.addSubview(animatedImageView)
             animatedImageView.startAnimating()
 
