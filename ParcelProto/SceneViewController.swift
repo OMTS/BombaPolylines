@@ -60,7 +60,8 @@ class SceneViewController: UIViewController {
     
     var targetPosition: CLLocation?
     var userLocation: CLLocation?
-    
+    var targetID: Int?
+    var playerID: Int?
     let locationManager = CLLocationManager()
     
     var fired = false {
@@ -105,13 +106,28 @@ class SceneViewController: UIViewController {
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        if #available(iOS 9.0, *) {
-            locationManager.requestLocation()
-        } else {
-            // Fallback on earlier versions
-            handleLocationPermissions()
-        }
+        locationManager.delegate = self
+
+        handleLocationPermissions()
     }
+    
+    func getJSON(urlToRequest: String) -> NSData {
+        let url = NSURL(string: urlToRequest)!
+        return NSData(contentsOfURL: url)!
+    }
+    
+    func parseJSON(inputData: NSData) -> NSDictionary? {
+        let pointsArray: NSDictionary?
+        do {
+            pointsArray = try NSJSONSerialization.JSONObjectWithData(inputData, options: NSJSONReadingOptions.MutableContainers) as? NSDictionary
+        }
+        catch _ {
+            pointsArray = nil
+        }
+        return pointsArray
+    }
+    
+
 
     @IBAction func fire(sender: UIButton) {
         fireUp()
@@ -121,7 +137,7 @@ class SceneViewController: UIViewController {
 extension SceneViewController: CLLocationManagerDelegate {
    
     func handleLocationPermissions() {
-        locationManager.delegate = self
+       // locationManager.delegate = self
         switch CLLocationManager.authorizationStatus() {
         case .Denied:
             //show error view
@@ -130,8 +146,11 @@ extension SceneViewController: CLLocationManagerDelegate {
             locationManager.requestWhenInUseAuthorization()
         case .AuthorizedWhenInUse:
             //All good
-            locationManager.startUpdatingLocation()
-            break
+            if #available(iOS 9.0, *) {
+                locationManager.requestLocation()
+            } else {
+                locationManager.startUpdatingLocation()
+            }
         case .Restricted:
             //Npt user's fault -> Display error anyway but without the tap gesture
             break
@@ -140,15 +159,14 @@ extension SceneViewController: CLLocationManagerDelegate {
         }
     }
     
-    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [AnyObject]) {
-        if let location = locations.first as? CLLocation {
+   func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+            let location = locations.first
             print("Current location: \(location)")
             if userLocation == nil {
                 userLocation = location
                 initUpdateLoop()
                 initGame()
             }
-        }
     }
     
     func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
@@ -223,7 +241,6 @@ extension SceneViewController {
         print("fired with \(percentOfFirePower * 100)%")
         let origianlDistance = CLLocation.distance(from: youAnnotation.coordinate, to: targetAnnotation.coordinate)
         
-        
         print("distance between you and target \(origianlDistance/1000)")
         
         var newLat = 0.0
@@ -288,7 +305,31 @@ extension SceneViewController {
         
         if fired {
             let totalSteps = Double(shootPolyline!.pointCount) * percentOfFirePower
+
             if parcelAnnotationPosition + parcelStep >=  Int(totalSteps) {
+                if percentOfFirePower == 1.0 {
+                    let url = NSURL(string: "https://project-bomba.herokuapp.com/api/v1/users/\(playerID!)/points/\(targetID!)/hits")
+                    let session = NSURLSession.sharedSession()
+                    
+                    let request = NSMutableURLRequest(URL: url!)
+                    request.HTTPMethod = "POST"
+
+                    let task = session.dataTaskWithRequest(request) {
+                        data, response, error in
+                        
+                        if error != nil {
+                            print("error=\(error)")
+                            return
+                        }
+                        
+                        print("response = \(response)")
+                        
+                        let responseString = NSString(data: data!, encoding: NSUTF8StringEncoding)
+                        print("responseString = \(responseString)")
+                    }
+                    task.resume()
+                }
+                
                 fired = false
                 initValues()
                 mapView.removeAnnotation(youAnnotation)

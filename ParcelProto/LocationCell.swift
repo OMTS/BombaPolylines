@@ -13,7 +13,8 @@ class LocationCell: UITableViewCell {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var latitudeLabel: UILabel!
     @IBOutlet weak var longitudeLabel: UILabel!
-    
+    @IBOutlet weak var userName: UILabel!
+
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

@@ -12,9 +12,14 @@ import MapKit
 class LocationPickerViewController: UIViewController {
     
     var points = [[String:AnyObject]]()
+    var playerID: Int?
+    let arrayOfUserNames = ["Iman","Arnaud","Jérémie","Eddy","Marine","Florent","Jérôme","Karim","Florian","Jenny"]
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var loader: UIActivityIndicatorView!
     
+
+    let locationManager = CLLocationManager()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -22,29 +27,11 @@ class LocationPickerViewController: UIViewController {
 
         loader.startAnimating()
         
-        func getJSON(urlToRequest: String) -> NSData {
-            return NSData(contentsOfURL: NSURL(string: urlToRequest)!)!
-        }
+        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        locationManager.delegate = self
         
-        func parseJSON(inputData: NSData) -> NSArray? {
-            let pointsArray: NSArray?
-            do {
-                pointsArray = try NSJSONSerialization.JSONObjectWithData(inputData, options: NSJSONReadingOptions.MutableContainers) as? NSArray
-            }
-            catch _ {
-                pointsArray = nil
-            }
-            return pointsArray
-        }
-        
-        
-        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(0.3 * Double(NSEC_PER_SEC)))
-        dispatch_after(delayTime, dispatch_get_main_queue(), { () -> Void in
-            self.points = parseJSON(getJSON("http://project-bomba.herokuapp.com/api/v1/points"))! as! [[String:AnyObject]]
-            self.loader.stopAnimating()
-            self.tableView.alpha = 1.0
-            self.tableView.reloadData()
-        })
+        // Fallback on earlier versions
+        handleLocationPermissions()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -73,6 +60,8 @@ class LocationPickerViewController: UIViewController {
         let lat = location["latitude"] as! Float
         let lng = location["longitude"] as! Float
         
+        vc.targetID = location["id"] as? Int
+        vc.playerID = playerID
         vc.targetPosition = CLLocation(latitude: Double(lat), longitude: Double(lng))
     }
 
@@ -105,6 +94,8 @@ extension LocationPickerViewController: UITableViewDataSource {
 
         cell.latitudeLabel.text = "\(lat)"
         cell.longitudeLabel.text = "\(lng)"
+        let id = point["user_id"] as! Int
+        cell.userName.text = "Created by " + arrayOfUserNames[id - 1]
 
         return cell
     }
@@ -114,5 +105,75 @@ extension LocationPickerViewController: UITableViewDelegate {
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
+}
+
+extension LocationPickerViewController: CLLocationManagerDelegate {
+    
+    func handleLocationPermissions() {
+        // locationManager.delegate = self
+        switch CLLocationManager.authorizationStatus() {
+        case .Denied:
+            //show error view
+            break
+        case .NotDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        case .AuthorizedWhenInUse:
+            //All good
+            if #available(iOS 9.0, *) {
+                locationManager.requestLocation()
+            } else {
+                locationManager.startUpdatingLocation()
+            }
+        case .Restricted:
+            //Npt user's fault -> Display error anyway but without the tap gesture
+            break
+        default:
+            break
+        }
+    }
+    
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let myLocation = locations.first
+        guard let location = myLocation else {
+            return
+        }
+        print("Current location: \(location)")
+        func getJSON(urlToRequest: String) -> NSData {
+            let url = NSURL(string: urlToRequest)!
+            return NSData(contentsOfURL: url)!
+        }
+        
+        func parseJSON(inputData: NSData) -> NSArray? {
+            let pointsArray: NSArray?
+            do {
+                pointsArray = try NSJSONSerialization.JSONObjectWithData(inputData, options: NSJSONReadingOptions.MutableContainers) as? NSArray
+            }
+            catch _ {
+                pointsArray = nil
+            }
+            return pointsArray
+        }
+        
+        
+        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(0.3 * Double(NSEC_PER_SEC)))
+        dispatch_after(delayTime, dispatch_get_main_queue(), { () -> Void in
+            
+            let url = "https://project-bomba.herokuapp.com/api/v1/points?latitude=\(location.coordinate.latitude)&longitude=\(location.coordinate.longitude)&exclude_user_id=\(self.playerID!)"
+            //exclude_user_id -> Excu les points crées par ce user
+            self.points = parseJSON(getJSON(url))! as! [[String:AnyObject]]
+            self.loader.stopAnimating()
+            self.tableView.alpha = 1.0
+            self.tableView.reloadData()
+        })
+    }
+    
+    func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
+        print("Error finding location: \(error.localizedDescription)")
+    }
+    
+    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        handleLocationPermissions()
+    }
+    
 }
 

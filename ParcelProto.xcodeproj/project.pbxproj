@@ -9,12 +9,14 @@
 /* Begin PBXBuildFile section */
 		9C2D90121B344962004F8ECC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C2D90111B344962004F8ECC /* AppDelegate.swift */; };
 		9C2D90141B344962004F8ECC /* SceneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C2D90131B344962004F8ECC /* SceneViewController.swift */; };
-		9C2D90171B344962004F8ECC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9C2D90151B344962004F8ECC /* Main.storyboard */; };
 		9C2D90191B344962004F8ECC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9C2D90181B344962004F8ECC /* Assets.xcassets */; };
 		9C2D90271B344962004F8ECC /* ParcelProtoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C2D90261B344962004F8ECC /* ParcelProtoTests.swift */; };
 		9C2D90321B344962004F8ECC /* ParcelProtoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C2D90311B344962004F8ECC /* ParcelProtoUITests.swift */; };
 		9C2D90401B344973004F8ECC /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C2D903F1B344973004F8ECC /* MapKit.framework */; };
 		9C2D90441B344E80004F8ECC /* UIImageAssetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C2D90431B344E80004F8ECC /* UIImageAssetExtension.swift */; };
+		9C31B55A1B99E7A1006AEAA2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9C31B5581B99E7A1006AEAA2 /* Main.storyboard */; };
+		9C5B51191BAC47F100ACAFDB /* CheckInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5B51181BAC47F100ACAFDB /* CheckInViewController.swift */; };
+		9CCD0E241BA321F70035B3C9 /* PlayerPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CCD0E231BA321F70035B3C9 /* PlayerPickerViewController.swift */; };
 		9CE27B0F1B592B7400B16E57 /* LocationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CE27B0E1B592B7400B16E57 /* LocationCell.swift */; };
 		9CE27B111B592B9800B16E57 /* LocationPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CE27B101B592B9800B16E57 /* LocationPickerViewController.swift */; };
 /* End PBXBuildFile section */
@@ -40,7 +42,6 @@
 		9C2D900E1B344962004F8ECC /* ParcelProto.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ParcelProto.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C2D90111B344962004F8ECC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9C2D90131B344962004F8ECC /* SceneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneViewController.swift; sourceTree = "<group>"; };
-		9C2D90161B344962004F8ECC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9C2D90181B344962004F8ECC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9C2D901D1B344962004F8ECC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9C2D90221B344962004F8ECC /* ParcelProtoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ParcelProtoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -51,7 +52,10 @@
 		9C2D90331B344962004F8ECC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9C2D903F1B344973004F8ECC /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		9C2D90431B344E80004F8ECC /* UIImageAssetExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageAssetExtension.swift; sourceTree = "<group>"; };
+		9C31B5591B99E7A1006AEAA2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		9C5B51181BAC47F100ACAFDB /* CheckInViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckInViewController.swift; sourceTree = "<group>"; };
 		9CC6CC621B501CF700302CBD /* Router.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
+		9CCD0E231BA321F70035B3C9 /* PlayerPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerPickerViewController.swift; sourceTree = "<group>"; };
 		9CE27B0E1B592B7400B16E57 /* LocationCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationCell.swift; sourceTree = "<group>"; };
 		9CE27B101B592B9800B16E57 /* LocationPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationPickerViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -110,9 +114,11 @@
 				9CC6CC611B501CC700302CBD /* Router */,
 				9C2D90421B344E80004F8ECC /* Utils */,
 				9C2D90111B344962004F8ECC /* AppDelegate.swift */,
+				9C31B5581B99E7A1006AEAA2 /* Main.storyboard */,
+				9C5B51181BAC47F100ACAFDB /* CheckInViewController.swift */,
+				9CCD0E231BA321F70035B3C9 /* PlayerPickerViewController.swift */,
 				9CE27B101B592B9800B16E57 /* LocationPickerViewController.swift */,
 				9C2D90131B344962004F8ECC /* SceneViewController.swift */,
-				9C2D90151B344962004F8ECC /* Main.storyboard */,
 				9C2D90181B344962004F8ECC /* Assets.xcassets */,
 				9C2D901D1B344962004F8ECC /* Info.plist */,
 			);
@@ -232,6 +238,7 @@
 		9C2D90061B344962004F8ECC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0710;
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Iman Zarrabian";
 				TargetAttributes = {
@@ -274,7 +281,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9C2D90191B344962004F8ECC /* Assets.xcassets in Resources */,
-				9C2D90171B344962004F8ECC /* Main.storyboard in Resources */,
+				9C31B55A1B99E7A1006AEAA2 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -303,7 +310,9 @@
 				9C2D90141B344962004F8ECC /* SceneViewController.swift in Sources */,
 				9CE27B0F1B592B7400B16E57 /* LocationCell.swift in Sources */,
 				9CE27B111B592B9800B16E57 /* LocationPickerViewController.swift in Sources */,
+				9CCD0E241BA321F70035B3C9 /* PlayerPickerViewController.swift in Sources */,
 				9C2D90121B344962004F8ECC /* AppDelegate.swift in Sources */,
+				9C5B51191BAC47F100ACAFDB /* CheckInViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -339,10 +348,10 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		9C2D90151B344962004F8ECC /* Main.storyboard */ = {
+		9C31B5581B99E7A1006AEAA2 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9C2D90161B344962004F8ECC /* Base */,
+				9C31B5591B99E7A1006AEAA2 /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
