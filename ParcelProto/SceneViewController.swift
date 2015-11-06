@@ -54,7 +54,7 @@ class SceneViewController: UIViewController {
 
     var shootPolyline: MKPolyline?
     var parcelAnnotation: MKPointAnnotation?
-    var parcelAnnotationPosition: Int = 0
+    var parcelAnnotationPosition: Double = 0
     var distance: CLLocationDistance = 0
     weak var parcelAnnotationView: MKAnnotationView!
     
@@ -71,7 +71,7 @@ class SceneViewController: UIViewController {
     }
     var youAnnotation: MKPointAnnotation!
     var targetAnnotation: MKPointAnnotation!
-    let debugMode = false
+    let debugMode = true
     let topCarretMaxConstraint = -25.0
     let topCarretMinConstraint = -235.0
     var carretHasToMove = false
@@ -178,6 +178,15 @@ extension SceneViewController: CLLocationManagerDelegate {
     }
     
 }
+extension Double {
+    var degreesToRadians : CGFloat {
+        return CGFloat(self) * CGFloat(M_PI) / 180.0
+    }
+    
+    var radiansToDegrees : CGFloat {
+        return CGFloat(self) * (180.0 / CGFloat(M_PI))
+    }
+}
 
 extension SceneViewController {
     func initGame(withRegionFit: Bool = true) {
@@ -213,6 +222,7 @@ extension SceneViewController {
             self.fireButton.enabled = true
         }
     }
+    
     
     func computePolyline() {
         let lowLengthRange = 103.0
@@ -270,6 +280,8 @@ extension SceneViewController {
         
         //Setting properties
         shootPolyline = MKGeodesicPolyline(coordinates: &coordinates, count: 2)
+        print("coordinates count \(coordinates.count)")
+
         mapView.addOverlay(shootPolyline!)
     }
     
@@ -277,7 +289,7 @@ extension SceneViewController {
         computePolyline()
         fired = true
         carretHasToMove = false
-        parcelAnnotationPosition = 0
+        parcelAnnotationPosition = 0.0
         //let LAX = CLLocation(latitude: 33.9424955, longitude: -118.4080684)
         parcelAnnotation!.coordinate = userLocation!.coordinate
     }
@@ -287,12 +299,12 @@ extension SceneViewController {
             return
         }
         
-        var parcelStep: Int
+        var parcelStep: Double
         if distance < 600_000 {
-            parcelStep = 1
+            parcelStep = 0.02
         }
         else if distance >= 600_000 && distance < 900_000 {
-            parcelStep = 3
+            parcelStep = 2
         }
         else {
             parcelStep = 10
@@ -306,7 +318,7 @@ extension SceneViewController {
         if fired {
             let totalSteps = Double(shootPolyline!.pointCount) * percentOfFirePower
 
-            if parcelAnnotationPosition + parcelStep >=  Int(totalSteps) {
+            if parcelAnnotationPosition + parcelStep >=  totalSteps {
                 if percentOfFirePower == 1.0 {
                     let url = NSURL(string: "https://project-bomba.herokuapp.com/api/v1/users/\(playerID!)/points/\(targetID!)/hits")
                     let session = NSURLSession.sharedSession()
@@ -338,7 +350,7 @@ extension SceneViewController {
                 return
             }
             parcelAnnotationPosition += parcelStep;
-            let nextMapPoint = shootPolyline?.points()[parcelAnnotationPosition]
+            let nextMapPoint = shootPolyline?.points()[Int(parcelAnnotationPosition)]
             realParcelAnnotation.coordinate = MKCoordinateForMapPoint(nextMapPoint!);
             parcelAnnotationView.superview?.bringSubviewToFront(parcelAnnotationView)
         }

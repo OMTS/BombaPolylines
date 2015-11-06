@@ -29,6 +29,8 @@ class CheckInViewController: UIViewController {
     }
     
     
+    
+    
     @IBAction func createPoint(sender: UIButton) {
         guard let userLoc = userLocation else {
             return
