@@ -20,6 +20,8 @@
 		36990B101BF627DC00D377BC /* AvatarComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36990B0F1BF627DC00D377BC /* AvatarComponent.swift */; };
 		36CC36241BFF60E6006F4364 /* PlayerAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36CC36231BFF60E6006F4364 /* PlayerAnnotationView.swift */; };
 		36CC36271BFF6791006F4364 /* CannonBallEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36CC36261BFF6791006F4364 /* CannonBallEntity.swift */; };
+		CB6C07051C023D76004FD10B /* Explosion_feu_MH.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = CB6C07031C023D76004FD10B /* Explosion_feu_MH.mp3 */; };
+		CB6C07061C023D76004FD10B /* Tire_boulet_MH.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = CB6C07041C023D76004FD10B /* Tire_boulet_MH.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +40,8 @@
 		36990B0F1BF627DC00D377BC /* AvatarComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarComponent.swift; sourceTree = "<group>"; };
 		36CC36231BFF60E6006F4364 /* PlayerAnnotationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerAnnotationView.swift; sourceTree = "<group>"; };
 		36CC36261BFF6791006F4364 /* CannonBallEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CannonBallEntity.swift; sourceTree = "<group>"; };
+		CB6C07031C023D76004FD10B /* Explosion_feu_MH.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Explosion_feu_MH.mp3; sourceTree = "<group>"; };
+		CB6C07041C023D76004FD10B /* Tire_boulet_MH.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Tire_boulet_MH.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +77,7 @@
 		36680A8A1BECE7BA0007A002 /* TestMapViewAndSKScene */ = {
 			isa = PBXGroup;
 			children = (
+				CB6C07011C023D76004FD10B /* Resources */,
 				36680A8B1BECE7BA0007A002 /* AppDelegate.swift */,
 				36990B141BF6364D00D377BC /* ViewControllers */,
 				36CC36201BFF579F006F4364 /* Views */,
@@ -162,6 +167,23 @@
 			name = CannoBallEntity;
 			sourceTree = "<group>";
 		};
+		CB6C07011C023D76004FD10B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CB6C07021C023D76004FD10B /* Sounds */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		CB6C07021C023D76004FD10B /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				CB6C07031C023D76004FD10B /* Explosion_feu_MH.mp3 */,
+				CB6C07041C023D76004FD10B /* Tire_boulet_MH.mp3 */,
+			);
+			path = Sounds;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -222,6 +244,8 @@
 			files = (
 				36680A961BECE7BA0007A002 /* LaunchScreen.storyboard in Resources */,
 				36680A931BECE7BA0007A002 /* Assets.xcassets in Resources */,
+				CB6C07061C023D76004FD10B /* Tire_boulet_MH.mp3 in Resources */,
+				CB6C07051C023D76004FD10B /* Explosion_feu_MH.mp3 in Resources */,
 				36680A911BECE7BA0007A002 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

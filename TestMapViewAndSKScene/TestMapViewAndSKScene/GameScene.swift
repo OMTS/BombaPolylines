@@ -67,6 +67,7 @@ class GameScene: SKScene {
                     cannonBall.cannonBallSprite.removeFromParent()
                     cannonBall.cannonBallShadowSprite.removeFromParent()
                     cannonBallsToRemove.addIndex(index)
+                    self.runAction(SKAction.playSoundFileNamed("Explosion_feu_MH", waitForCompletion: false))
                 }
             }
             ++index
@@ -154,18 +155,23 @@ extension GameScene {
 
         } else {
             // Opponents
-            self.fireBigCannonBallFromPlayer(self.player, toPlayer: player)
+            if let playerCoordinate = self.player.coordinate, let opponentCoordinate = player.coordinate {
+                self.fireBigCannonBallFromLocation(playerCoordinate, toLocation: opponentCoordinate)
+            }
         }
     }
 }
 
 // MARK: Shoot management
 extension GameScene {
-    func fireBigCannonBallFromPlayer(fromPlayer: PlayerEntity, toPlayer: PlayerEntity) {
-        let cannonBall = CannonBallEntity(withPlayer: fromPlayer, opponent: toPlayer)
+    
+    func fireBigCannonBallFromLocation(fromLocation: CLLocationCoordinate2D, toLocation: CLLocationCoordinate2D) {
+        let cannonBall = CannonBallEntity(withShootingCoordinate: fromLocation, targetCoordinate: toLocation, inMapView: self.mapView, renderView: self.view!)
         self.effectsLayer.addChild(cannonBall.cannonBallShadowSprite)
         self.effectsLayer.addChild(cannonBall.cannonBallSprite)
         self.cannonBalls.addObject(cannonBall)
+        
+        self.runAction(SKAction.playSoundFileNamed("Tire_boulet_MH", waitForCompletion: false))
     }
 }
 
@@ -239,6 +245,7 @@ extension GameScene: MKMapViewDelegate {
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
         if let playerAnnotationView = view as? PlayerAnnotationView, let player = playerAnnotationView.player {
             self.userDidTapPlayer(player)
+            mapView.deselectAnnotation(view.annotation, animated: false)
         }
     }
 }
