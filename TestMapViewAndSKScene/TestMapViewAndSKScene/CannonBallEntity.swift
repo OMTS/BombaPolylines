@@ -49,6 +49,16 @@ class CannonBallEntity: GKEntity {
         self.cannonBallSprite.position = position;
     }
     
+    func addCannonBallToGroundLayer(groundLayer: SKNode, effectsLayer: SKNode) {
+        groundLayer.addChild(self.cannonBallShadowSprite)
+        effectsLayer.addChild(self.cannonBallSprite)
+    }
+    
+    func removeCannonBallFromNode() {
+        self.cannonBallSprite.removeFromParent()
+        self.cannonBallShadowSprite.removeFromParent()
+    }
+    
     override func updateWithDeltaTime(seconds: NSTimeInterval) {
         
         self.elapsedTime += seconds

@@ -23,10 +23,29 @@ class GameScene: SKScene {
     var mapView: MKMapView! {
         didSet {
             mapView.delegate = self
+            let tapGesture = UITapGestureRecognizer(target: self, action: "userDidTapMapView:")
+            tapGesture.numberOfTapsRequired = 1;
+            tapGesture.numberOfTouchesRequired = 1;
+            mapView.addGestureRecognizer(tapGesture);
+
+            let tapGesture2 = UITapGestureRecognizer(target: self, action: nil)
+            tapGesture2.numberOfTapsRequired = 2;
+            tapGesture2.numberOfTouchesRequired = 1;
+            mapView.addGestureRecognizer(tapGesture2);
+            
+            tapGesture.requireGestureRecognizerToFail(tapGesture2)
+            tapGesture.delegate = self
+
+            let subviews = mapView.subviews
+            
+            for gestureRec in mapView.gestureRecognizers! {
+                print("gesture = \(gestureRec)");
+            }
         }
     }
     
     // Scene layers
+    let groundLayer: SKNode = SKNode()
     let effectsLayer: SKNode = SKNode()
     let playersLayer: SKNode = SKNode()
     
@@ -36,6 +55,7 @@ class GameScene: SKScene {
         super.didMoveToView(view)
 
         // Setup scene layers
+        self.addChild(self.groundLayer)
         self.addChild(self.playersLayer)
         self.addChild(self.effectsLayer)
         
@@ -64,8 +84,7 @@ class GameScene: SKScene {
                 cannonBall.updateWithDeltaTime(dt)
 
                 if cannonBall.endOfTrip {
-                    cannonBall.cannonBallSprite.removeFromParent()
-                    cannonBall.cannonBallShadowSprite.removeFromParent()
+                    cannonBall.removeCannonBallFromNode()
                     cannonBallsToRemove.addIndex(index)
                     self.runAction(SKAction.playSoundFileNamed("Explosion_feu_MH", waitForCompletion: false))
                 }
@@ -75,6 +94,21 @@ class GameScene: SKScene {
         
         if cannonBallsToRemove.count > 0 {
             self.cannonBalls.removeObjectsAtIndexes(cannonBallsToRemove)
+        }
+        
+        // Z ordering
+        var children = self.playersLayer.children
+        children.sortInPlace { (node1, node2) -> Bool in
+            if node1.position.y > node2.position.y
+                || (node1.position.y == node2.position.y && node1.position.x > node2.position.x ) {
+                return true
+            }
+            return false
+        }
+        
+        self.playersLayer.removeAllChildren()
+        for child in children {
+            self.playersLayer.addChild(child)
         }
     }
 }
@@ -167,8 +201,7 @@ extension GameScene {
     
     func fireBigCannonBallFromLocation(fromLocation: CLLocationCoordinate2D, toLocation: CLLocationCoordinate2D) {
         let cannonBall = CannonBallEntity(withShootingCoordinate: fromLocation, targetCoordinate: toLocation, inMapView: self.mapView, renderView: self.view!)
-        self.effectsLayer.addChild(cannonBall.cannonBallShadowSprite)
-        self.effectsLayer.addChild(cannonBall.cannonBallSprite)
+        cannonBall.addCannonBallToGroundLayer(self.effectsLayer, effectsLayer:self.effectsLayer)
         self.cannonBalls.addObject(cannonBall)
         
         self.runAction(SKAction.playSoundFileNamed("Tire_boulet_MH", waitForCompletion: false))
@@ -177,6 +210,10 @@ extension GameScene {
 
 // MARK: Map view management
 extension GameScene {
+    
+    func userDidTapMapView(tapGesture: UITapGestureRecognizer) {
+        print("--> userDidTapMapView")
+    }
     
     func getAllPlayersAnnotations() -> [MKAnnotation] {
         // Get all annotations
@@ -247,5 +284,15 @@ extension GameScene: MKMapViewDelegate {
             self.userDidTapPlayer(player)
             mapView.deselectAnnotation(view.annotation, animated: false)
         }
+    }
+}
+
+extension GameScene: UIGestureRecognizerDelegate {
+    
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
+        if touch.view is MKAnnotationView {
+            return false
+        }
+        return true
     }
 }
