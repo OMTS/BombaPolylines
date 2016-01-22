@@ -16,25 +16,19 @@ class PlayerPickerViewController: UITableViewController {
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        guard let vc = segue.destinationViewController as? UITabBarController  where vc.viewControllers![0] is LocationPickerViewController else {
+        guard let vc = segue.destinationViewController as? SceneViewController else {
             return
         }
-        guard segue.identifier == "locationSelector" else {
+        guard segue.identifier == "GameSceneAccess" else {
             return
         }
         guard let indexPath = sender as? NSIndexPath else {
             return
         }
-        let selectedVC = vc.viewControllers![0] as! LocationPickerViewController
-        let selectedVC2 = vc.viewControllers![1] as! CheckInViewController
-
-        selectedVC.playerID = indexPath.row + 1
-        selectedVC2.playerID = indexPath.row + 1
-
+        vc.playerID = indexPath.row + 1
     }
     
-    
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        performSegueWithIdentifier("locationSelector", sender: indexPath)
+        performSegueWithIdentifier("GameSceneAccess", sender: indexPath)
     }
 }

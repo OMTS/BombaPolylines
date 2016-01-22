@@ -62,7 +62,7 @@ class LocationPickerViewController: UIViewController {
         
         vc.targetID = location["id"] as? Int
         vc.playerID = playerID
-        vc.targetPosition = CLLocation(latitude: Double(lat), longitude: Double(lng))
+//        vc.targetPosition = CLLocation(latitude: Double(lat), longitude: Double(lng))
     }
 
     /*

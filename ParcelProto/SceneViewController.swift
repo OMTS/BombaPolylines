@@ -8,100 +8,31 @@
 
 import UIKit
 import MapKit
-
-struct Carret {
-    enum Direction {
-        case Up
-        case Down
-    }
-    
-    var direction = Direction.Down
-    var initialPosition = -25.0
-    var destinationPosition = -235.0
-    var currentPosition = -235.0
-    
-    mutating func nextPosition() -> Double {
-        let speed = 7.0
-        switch direction {
-        case .Down:
-            if currentPosition - speed <= destinationPosition {
-                direction = .Up
-                currentPosition += speed
-                return currentPosition
-            }
-            else {
-                direction = .Down
-                currentPosition -= speed
-                return currentPosition
-            }
-        case .Up:
-            if currentPosition + speed >= initialPosition {
-                direction = .Down
-                currentPosition -= speed
-                return currentPosition
-            }
-            else {
-                direction = .Up
-                currentPosition += speed
-                return currentPosition
-            }
-        }
-    }
-}
-
+import SpriteKit
 
 class SceneViewController: UIViewController {
 
-    var shootPolyline: MKPolyline?
-    var parcelAnnotation: MKPointAnnotation?
-    var parcelAnnotationPosition: Double = 0
-    var distance: CLLocationDistance = 0
-    weak var parcelAnnotationView: MKAnnotationView!
+    @IBOutlet weak var gameView: UIView!
     
-    var targetPosition: CLLocation?
+    // UI
+    var mapView: MKMapView!
+    var spriteView: SKView!
+    var gameScene: GameScene!
+
     var userLocation: CLLocation?
     var targetID: Int?
     var playerID: Int?
     let locationManager = CLLocationManager()
     
-    var fired = false {
-        willSet {
-            self.fireButton.enabled = fired
-        }
-    }
-    var youAnnotation: MKPointAnnotation!
-    var targetAnnotation: MKPointAnnotation!
     let debugMode = true
-    let topCarretMaxConstraint = -25.0
-    let topCarretMinConstraint = -235.0
-    var carretHasToMove = false
-    
-    var actualCarret = Carret(direction: .Down, initialPosition: -25.0, destinationPosition: -235.0, currentPosition: -235.0)
-    var percentOfFirePower = 1.0
-    
-    @IBOutlet weak var fireButton: UIButton!
-    @IBOutlet weak var mapView: MKMapView!
-    @IBOutlet weak var controlView: UIView!
-    @IBOutlet weak var carret: UIImageView!
-    @IBOutlet weak var carretTopConstraint: NSLayoutConstraint!
-    
-    
-    func initValues() {
-        carretHasToMove = false
-        actualCarret = Carret(direction: .Down, initialPosition: -25.0, destinationPosition: -235.0, currentPosition: -235.0)
-        percentOfFirePower = 1.0
-    }
     
     @IBAction func goBack(sender: UIButton) {
         self.navigationController?.popViewControllerAnimated(true)
     }
-    func initUpdateLoop() {
-        let displayLink = CADisplayLink(target: self, selector: "update")
-        displayLink.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.layoutIfNeeded()
         
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
@@ -109,6 +40,36 @@ class SceneViewController: UIViewController {
         locationManager.delegate = self
 
         handleLocationPermissions()
+        
+        self.addMapView()
+        self.addGameView()
+    }
+    
+    func addMapView() {
+        self.mapView = MKMapView(frame: self.gameView.bounds)
+        self.mapView.autoresizingMask = [UIViewAutoresizing.FlexibleWidth, UIViewAutoresizing.FlexibleHeight]
+        self.gameView.addSubview(self.mapView)
+    }
+    
+    func addGameView() {
+        // Add game view
+        self.spriteView = SKView(frame: self.gameView.bounds)
+        self.spriteView.autoresizingMask = [UIViewAutoresizing.FlexibleWidth, UIViewAutoresizing.FlexibleHeight]
+        self.spriteView.backgroundColor = UIColor.clearColor()
+        self.spriteView.allowsTransparency = true;
+        self.spriteView.userInteractionEnabled = false;
+        self.gameView.addSubview(self.spriteView)
+        
+        // Add game scene
+        print("gameView frame = \(self.gameView.frame)");
+        self.gameScene = GameScene(size: self.gameView.bounds.size)
+        self.gameScene.mapView = self.mapView
+        self.gameScene.backgroundColor = UIColor.clearColor()
+        self.spriteView.presentScene(self.gameScene)
+    }
+    
+    override func prefersStatusBarHidden() -> Bool {
+        return true;
     }
     
     func getJSON(urlToRequest: String) -> NSData {
@@ -125,12 +86,6 @@ class SceneViewController: UIViewController {
             pointsArray = nil
         }
         return pointsArray
-    }
-    
-
-
-    @IBAction func fire(sender: UIButton) {
-        fireUp()
     }
 }
 
@@ -158,15 +113,18 @@ extension SceneViewController: CLLocationManagerDelegate {
             break
         }
     }
-    
-   func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-            let location = locations.first
-            print("Current location: \(location)")
-            if userLocation == nil {
-                userLocation = location
-                initUpdateLoop()
-                initGame()
-            }
+
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.first else {
+            return
+        }
+        print("Current location: \(location)")
+
+        if self.userLocation == nil {
+            self.userLocation = location
+            self.gameScene.loadPlayer(withId: self.playerID!, forLocation:location)
+            self.gameScene.loadOpponentsTotems(forLocation:location)
+        }
     }
     
     func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
@@ -176,8 +134,8 @@ extension SceneViewController: CLLocationManagerDelegate {
     func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
         handleLocationPermissions()
     }
-    
 }
+
 extension Double {
     var degreesToRadians : CGFloat {
         return CGFloat(self) * CGFloat(M_PI) / 180.0
@@ -189,136 +147,13 @@ extension Double {
 }
 
 extension SceneViewController {
-    func initGame(withRegionFit: Bool = true) {
-        
-        mapView.delegate = self
-        distance = CLLocation.distance(from: userLocation!.coordinate, to: targetPosition!.coordinate)
-        
-        youAnnotation = MKPointAnnotation()
-        youAnnotation.coordinate = userLocation!.coordinate
-        mapView.addAnnotation(youAnnotation)
-        
-        targetAnnotation = MKPointAnnotation()
-        targetAnnotation.coordinate = targetPosition!.coordinate
-        mapView.addAnnotation(targetAnnotation)
-        
-        parcelAnnotation = MKPointAnnotation()
-        parcelAnnotation!.title = "Parcel"
-        parcelAnnotation!.coordinate = userLocation!.coordinate
-        mapView.addAnnotation(parcelAnnotation!)
 
+//    func update() {
         
-        if withRegionFit {
-           // let startCoord = CLLocationCoordinate2DMake(39.013762, -94.400840)
-           // let adjustedRegion = mapView.regionThatFits(MKCoordinateRegionMakeWithDistance(startCoord, 4800000, 4800000))
-           // mapView.setRegion(adjustedRegion, animated: true)
-            mapView.showAnnotations([youAnnotation, targetAnnotation], animated: true)
-        }
-        
-        self.fireButton.enabled = false
-        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(3.0 * Double(NSEC_PER_SEC)))
-        dispatch_after(delayTime, dispatch_get_main_queue()) { () -> Void in
-            self.carretHasToMove = true
-            self.fireButton.enabled = true
-        }
-    }
-    
-    
-    func computePolyline() {
-        let lowLengthRange = 103.0
-        let highLengthRange = 41.0
+//        if fired {
+//            let totalSteps = Double(shootPolyline!.pointCount) * percentOfFirePower
 
-        func getStrengthPercent () -> Double {
-            //-66
-            //-132
-            if self.carretTopConstraint.constant <= -66.0 &&
-                self.carretTopConstraint.constant >= -132 {
-                    return 1
-            }
-            else {
-                if self.carretTopConstraint.constant <= -132.0 {
-                    let p = (235.0 - Double(-self.carretTopConstraint.constant)) / lowLengthRange
-                    return p
-                }
-                else {
-                    let p = 1 + (66 - Double(-self.carretTopConstraint.constant)) / highLengthRange
-                    return p
-                }
-            }
-        }
-        
-        percentOfFirePower = getStrengthPercent()
-        print("fired with \(percentOfFirePower * 100)%")
-        let origianlDistance = CLLocation.distance(from: youAnnotation.coordinate, to: targetAnnotation.coordinate)
-        
-        print("distance between you and target \(origianlDistance/1000)")
-        
-        var newLat = 0.0
-        var newLng = 0.0
-        
-        if targetAnnotation.coordinate.latitude > youAnnotation.coordinate.latitude {
-            newLat = youAnnotation.coordinate.latitude + abs(youAnnotation.coordinate.latitude - targetAnnotation.coordinate.latitude) * percentOfFirePower
-        }
-        else {
-            newLat = youAnnotation.coordinate.latitude - abs(youAnnotation.coordinate.latitude - targetAnnotation.coordinate.latitude) * percentOfFirePower
-        }
-        
-        if targetAnnotation.coordinate.longitude > youAnnotation.coordinate.longitude {
-            newLng = youAnnotation.coordinate.longitude + abs(youAnnotation.coordinate.longitude - targetAnnotation.coordinate.longitude) * percentOfFirePower
-        }
-        else {
-            newLng = youAnnotation.coordinate.longitude - abs(youAnnotation.coordinate.longitude - targetAnnotation.coordinate.longitude) * percentOfFirePower
-        }
-        
-        
-        let newDistance = CLLocation.distance(from: youAnnotation.coordinate, to: CLLocationCoordinate2D(latitude: newLat, longitude: newLng))
-        print("new distance between you and target \(newDistance/1000)")
-
-        
-        print("new Lat : \(newLat) new Lng: \(newLng)")
-        var coordinates = [youAnnotation.coordinate, CLLocationCoordinate2D(latitude: newLat, longitude: newLng)]
-        
-        //Setting properties
-        shootPolyline = MKGeodesicPolyline(coordinates: &coordinates, count: 2)
-        print("coordinates count \(coordinates.count)")
-
-        mapView.addOverlay(shootPolyline!)
-    }
-    
-    func fireUp() {
-        computePolyline()
-        fired = true
-        carretHasToMove = false
-        parcelAnnotationPosition = 0.0
-        //let LAX = CLLocation(latitude: 33.9424955, longitude: -118.4080684)
-        parcelAnnotation!.coordinate = userLocation!.coordinate
-    }
-
-    func update() {
-        guard let realParcelAnnotation = parcelAnnotation else {
-            return
-        }
-        
-        var parcelStep: Double
-        if distance < 600_000 {
-            parcelStep = 0.02
-        }
-        else if distance >= 600_000 && distance < 900_000 {
-            parcelStep = 2
-        }
-        else {
-            parcelStep = 10
-        }
-        
-        if carretHasToMove {
-            let nextPosition = actualCarret.nextPosition()
-            self.carretTopConstraint.constant = CGFloat(nextPosition)
-        }
-        
-        if fired {
-            let totalSteps = Double(shootPolyline!.pointCount) * percentOfFirePower
-
-            if parcelAnnotationPosition + parcelStep >=  totalSteps {
+/*            if parcelAnnotationPosition + parcelStep >=  totalSteps {
                 if percentOfFirePower == 1.0 {
                     let url = NSURL(string: "https://project-bomba.herokuapp.com/api/v1/users/\(playerID!)/points/\(targetID!)/hits")
                     let session = NSURLSession.sharedSession()
@@ -348,13 +183,13 @@ extension SceneViewController {
                 mapView.removeAnnotation(targetAnnotation)
                 initGame(false)
                 return
-            }
-            parcelAnnotationPosition += parcelStep;
-            let nextMapPoint = shootPolyline?.points()[Int(parcelAnnotationPosition)]
-            realParcelAnnotation.coordinate = MKCoordinateForMapPoint(nextMapPoint!);
-            parcelAnnotationView.superview?.bringSubviewToFront(parcelAnnotationView)
-        }
-    }
+            }*/
+//            parcelAnnotationPosition += parcelStep;
+//            let nextMapPoint = shootPolyline?.points()[Int(parcelAnnotationPosition)]
+//            realParcelAnnotation.coordinate = MKCoordinateForMapPoint(nextMapPoint!);
+//            parcelAnnotationView.superview?.bringSubviewToFront(parcelAnnotationView)
+//        }
+//    }
     
     func getYouAnimatedImage() -> UIImageView {
         let imageview = UIImageView(frame: CGRectMake(0, 0, 150, 100))
@@ -378,8 +213,7 @@ extension SceneViewController {
 }
 
 
-
-extension SceneViewController: MKMapViewDelegate {
+/*extension SceneViewController: MKMapViewDelegate {
 
     func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
         let pinIdentifier = "Parcel"
@@ -451,7 +285,7 @@ extension SceneViewController: MKMapViewDelegate {
             }
         }
     }
-}
+}*/
 
 
 extension CLLocation {
@@ -470,3 +304,4 @@ extension CLLocation {
         }
     }
 }
+
